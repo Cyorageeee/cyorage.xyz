@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>深度优先搜索(DFS)基础学习笔记</title>
+    <link href="/20230430/dfs_notes/"/>
+    <url>/20230430/dfs_notes/</url>
+    
+    <content type="html"><![CDATA[<p>近些时间在学习DFS算法的时候稍微因为理解上的问题走了一些弯路，稍微为自己记录一下想法历程。<br>因为是第一次以这样的形式来写笔记，难免有不足之处，如果你有对文章的意见，还请不吝指教。  </p><h2 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h2><h3 id="DFS是什么？"><a href="#DFS是什么？" class="headerlink" title="DFS是什么？"></a>DFS是什么？</h3><p>以下是来自维基中关于<a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>的介绍：  </p><blockquote><p>Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root node (selecting some arbitrary node as the root node in the case of a graph) and explores as far as possible along each branch before backtracking. Extra memory, usually a stack, is needed to keep track of the nodes discovered so far along a specified branch which helps in backtracking of the graph.  </p></blockquote><p>也就是说，当我们把问题具象为一个网的时候，DFS可以让我们循着网的一条路径尽可能深的去遍历这个网，并根据每一步搜索的结果来决定接下来的步骤，最终在当前的路径的尽头回溯并开始另一路径的搜索。<br>于是，能够得出它有以下性质:  </p><ol><li>为了求得问题的解，先选择某种情况向前探索当前的网；  </li><li>一直向前，当发现搜索到的解是错误的，就退回一步，重新向前探索；  </li><li>如此循环往复，直到发现问题无解或者找到正确的解。</li></ol><h2 id="DFS的操作过程"><a href="#DFS的操作过程" class="headerlink" title="DFS的操作过程"></a>DFS的操作过程</h2><p>首先，我们假设有点V1-V9。<br>在当前状态中，我们假设V1-V9都未被访问，如下图:  </p><p><img src="/img/2023-04-30-dfs_notes_01.webp">  </p><p>我们先开始访问V1，此时V1被标记:  </p><p><img src="/img/2023-04-30-dfs_notes_02.webp">  </p><p>现在与V1相邻的点有V2与V3两个，我们任选一个:  </p><p><img src="/img/2023-04-30-dfs_notes_03.webp">  </p><p><em>此时的路径为V1-&gt;V2。</em>  </p><p>当进行到V2时，与V2相邻的节点有V1,V4与V7，但V1现在已经被标记使用，所以在V4与V7中继续任选一个:  </p><p><img src="/img/2023-04-30-dfs_notes_04.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4。</em>  </p><p>当进行到V4时，与V4相邻的节点有V2与V5，但V2同样已经被标记使用，所以现在能够搜索的节点只有V5了:  </p><p><img src="/img/2023-04-30-dfs_notes_05.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4-&gt;V5。</em>  </p><p>随后，我们发现只有V7没有被访问，于是开始走向节点V7:  </p><p><img src="/img/2023-04-30-dfs_notes_06.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4-&gt;V5-&gt;V7。</em>  </p><p>如你所见，现在在节点V7出发，已经找不到未被搜索的点了。<br>在这种情况下，DFS会进行回溯。聪明如你，应该能够猜到DFS会回溯到最近的且连接有未访问节点的节点，事实也确实如此。<br>所以此时DFS按照原路回溯到点V1，现在它能够发现点V3未被访问，于是开始访问V3:  </p><p><img src="/img/2023-04-30-dfs_notes_07.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4-&gt;V5-&gt;V7-&gt;V3</em><br>同样的道理，继续搜索点V6，并在下一步任选一个，假设选择搜索节点V8:  </p><p><img src="/img/2023-04-30-dfs_notes_08.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4-&gt;V5-&gt;V7-&gt;V3-&gt;V6-&gt;V8。</em>  </p><p>继续搜索V9:  </p><p><img src="/img/2023-04-30-dfs_notes_09.webp">  </p><p><em>此时的路径为V1-&gt;V2-&gt;V4-&gt;V5-&gt;V7-&gt;V3-&gt;V6-&gt;V8-&gt;V9。</em>  </p><p>于是我们发现我们遇到了在V7节点同样的状况，于是有同样的处理方法：按照先前所搜索过的顺序回溯，现在我们发现全部节点都已经被搜索过了。<br>现在，DFS就会结束这一次的搜索。  </p><p>从流程中可以得到，通常来说DFS的最差时间复杂度为$O(n!)$。  </p><h2 id="来举个例子！"><a href="#来举个例子！" class="headerlink" title="来举个例子！"></a>来举个例子！</h2><p>以<a href="https://www.luogu.com.cn/problem/P1706">Luogu P1706</a>为例，我们通过它来增进对DFS的理解。该段代码写作参考了<a href="https://oi-wiki.org/search/dfs/">DFS(搜索)- OI Wiki</a>中的思路。   </p><details>  <summary> 点击展开 </summary>  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iomanip&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXN 114</span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">int</span> n,search[MAXN]; <span class="hljs-comment">//初始化记录查找次数的变量及存储查找到的数据的数组</span><br><span class="hljs-type">bool</span> vis[MAXN]; <span class="hljs-comment">//记录当前执行状态</span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> step)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (step==n+<span class="hljs-number">1</span>) <span class="hljs-comment">//设置边界，记录遍历执行末的退出条件</span><br>    &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=n; i++)<br>        &#123;<br>            cout &lt;&lt; <span class="hljs-built_in">setw</span>(<span class="hljs-number">5</span>) &lt;&lt; search[i]; <span class="hljs-comment">//设置场宽并输出每段结果 </span><br>        &#125;<br>        cout &lt;&lt; endl;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=n; i++)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (vis[i] == <span class="hljs-number">0</span>) <span class="hljs-comment">//判断数字i是否正在目前执行的全排列中</span><br>        &#123;<br>            vis[i]=<span class="hljs-number">1</span>; <span class="hljs-comment">//标记当前节点</span><br>            search[step]=i; <span class="hljs-comment">//存储结果到数组</span><br>            <span class="hljs-built_in">dfs</span>(step+<span class="hljs-number">1</span>); <span class="hljs-comment">//进行递归</span><br>            vis[i]=<span class="hljs-number">0</span>; <span class="hljs-comment">//重置状态，方便下一步回溯</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cin &gt;&gt; n;<br>    <span class="hljs-built_in">dfs</span>(<span class="hljs-number">1</span>); <span class="hljs-comment">//设置起始步数</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure></details>  <p>听起来似乎有点抽象…那么我们来一点一点分析。<br>以题目中给出的样例数据为例，我们可以同样将问题具象为具有三个节点的树。就像这样:  </p><p><img src="/img/2023-04-30-dfs_notes_10.webp">  </p><p>自1开始，我们依旧任选其一来搜索:  </p><p><img src="/img/2023-04-30-dfs_notes_11.webp">  </p><p><em>此时的路径为1-&gt;2</em>  </p><p>搜索的步骤对应递归代码中进行递归的部分，继续传递搜索结果并进行相应的回溯。<br>接下来的步骤就像上文中提到的那样，回溯到节点1并且搜索节点3:  </p><p><img src="/img/2023-04-30-dfs_notes_12.webp"></p><p>此时搜索到的结果就是”1 2 3”并输出。周而复始，搜索到该排列下所有的可能性之后，就从节点2开始继续遵循上文DFS的原则开始搜索。  </p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://zhuanlan.zhihu.com/p/41307874">算法分析 | 一文理解搜索算法-彻底入门DFS - 知乎</a><br><a href="http://data.biancheng.net/view/325.html">深度优先搜索（DFS）算法详解</a><br><a href="https://blog.csdn.net/qq_47733361/article/details/123858318">DFS (深度优先搜索) 算法详解 + 模板 + 例题，这一篇就够了 - CSDN</a><br><a href="https://oi-wiki.org/search/dfs/">DFS(搜索)- OI Wiki</a><br><a href="https://www.luogu.com.cn/problem/P1706">P1706 全排列问题 - 洛谷</a>  </p>]]></content>
+    
+    
+    <categories>
+      
+      <category>学习笔记</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>关于OI</tag>
+      
+      <tag>算法基础</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>AtCoder AT_abc291_c 题解</title>
+    <link href="/20230314/abc291c/"/>
+    <url>/20230314/abc291c/</url>
+    
+    <content type="html"><![CDATA[<p>最近在清AtCoder的Beginner Contest的水题的时候刷到了一道蛮有意思的水题，也因为经验不够被这道题卡了不少时间，于是想要把自己的思路与做法记录一下。  </p><h2 id="题意"><a href="#题意" class="headerlink" title="题意"></a>题意</h2><p>大致就是模拟一下坐标，然后求走过的坐标是否有重叠，如果有输出<strong>Yes</strong>，没有就输出<strong>No</strong>.要注意的是初始坐标与最后一个坐标也要判断。    </p><h2 id="思路过程"><a href="#思路过程" class="headerlink" title="思路过程"></a>思路过程</h2><p>乍一看，好像是随随便便就能秒的题目。<br>看起来整个题目要做的，就是模拟高桥君走过的坐标，然后遍历坐标，如果遍历到了重复的坐标就输出Yes，没有的话就输出No.<br>很天真的我就这么干了，于是被鸽子狠狠踢了。<br>再仔细看看题目，数据的范围是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>≤</mo><mi>N</mi><mo>≤</mo><mn>2</mn><mo>×</mo><mn>1</mn><msup><mn>0</mn><mn>5</mn></msup></mrow><annotation encoding="application/x-tex">1≤N≤2×10^{5}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.13597em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span>，欸不对啊，如果暴力遍历的话是绝对会TLE的。<br>随后选择了开结构体，开自定义sort对坐标进行排序，之后一个一个在前后去进行比较，这样时间复杂度就能够得到大大的降低。<br><del>然后过了，下面忘了</del>  </p><h2 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">const</span> <span class="hljs-type">int</span> MAXN=<span class="hljs-number">200001</span>;<br><span class="hljs-type">int</span> cnt;<br><span class="hljs-type">char</span> inst[MAXN];<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">path</span><br>&#123;<br>    <span class="hljs-type">int</span> x,y;<br>&#125;p[MAXN]=&#123;<span class="hljs-number">0</span>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">cmp</span><span class="hljs-params">(path a, path b)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (a.x != b.x)<br>    &#123;<br>        <span class="hljs-keyword">return</span> a.x &lt; b.x;<br>    &#125;<br>    <span class="hljs-keyword">return</span> a.y &lt; b.y;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cin &gt;&gt; cnt;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=cnt; i++)<br>    &#123;<br>        cin &gt;&gt; inst[i];<br>    &#125;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=cnt; i++)<br>    &#123;<br>        p[i].x=p[i<span class="hljs-number">-1</span>].x;<br>        p[i].y=p[i<span class="hljs-number">-1</span>].y;<br>        <span class="hljs-keyword">if</span>(inst[i]==<span class="hljs-string">&#x27;R&#x27;</span>)<br>        &#123;<br>            p[i].x++;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(inst[i]==<span class="hljs-string">&#x27;L&#x27;</span>)<br>        &#123;<br>            p[i].x--;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(inst[i]==<span class="hljs-string">&#x27;U&#x27;</span>)<br>        &#123;<br>            p[i].y++;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(inst[i]==<span class="hljs-string">&#x27;D&#x27;</span>)<br>        &#123;<br>            p[i].y--;<br>        &#125;<br>    &#125;<br>    <span class="hljs-built_in">sort</span>(p,p+cnt+<span class="hljs-number">1</span>,cmp);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=cnt; i++)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (p[i].x==p[i<span class="hljs-number">-1</span>].x&amp;&amp;p[i].y==p[i<span class="hljs-number">-1</span>].y)<br>        &#123;<br>            cout &lt;&lt; <span class="hljs-string">&quot;Yes&quot;</span> &lt;&lt; endl;<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>        &#125;<br>    &#125;<br>    cout &lt;&lt; <span class="hljs-string">&quot;No&quot;</span> &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>OI题解</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>OI题解</tag>
+      
+      <tag>AtCoder</tag>
+      
+      <tag>C++</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>旧事重提——记一次被Cloudflare标记为钓鱼网站的经历</title>
+    <link href="/20230120/cloudflare_phishing/"/>
+    <url>/20230120/cloudflare_phishing/</url>
+    
+    <content type="html"><![CDATA[<p>最近在打开Cloudflare的统计界面的时候，忽然想起来还有这一回事，而在当时能在搜索引擎找到的被Cloudflare标记为钓鱼网站的事情似乎并不多 <del>谁没事会去搞这种事情啊</del> ，于是便想要把这<del>有趣</del>的跟Cloudflare和Netcraft的扯皮的过程记录下来。  </p><h2 id="契机"><a href="#契机" class="headerlink" title="契机"></a>契机</h2><p>在这件事情发生之前，我正因当时Lowlight下载站的关闭而运行着一个作为替代的音游下载站，也就是后来的Sutaraito。<br>一位群友建议我可以通过Cloudflare的<a href="https://workers.cloudflare.com/">Workers</a>功能通过反向代理来加速OneDrive在国内的下载速度,于是我就这么做了。 <del>虽然事实证明会拖慢大多数情况下的下载速度</del>  </p><h2 id="噔-噔-咚"><a href="#噔-噔-咚" class="headerlink" title="噔 噔 咚"></a>噔 噔 咚</h2><p>刚挂上的那晚上，一切正常。但是到了11月29日早上，我发现我一连收到了分别来自Cloudflare，Netcraft，Microsoft三方的几封邮件，而内容都是关于我设置的反代网站，同时，我的整个域名(*.cyoragex.top)都被Cloudflare标记为了钓鱼网站，群消息也被刷爆了。<br><img src="/img/2023-1-20_phishing_01.webp" alt="心肺停止"><br>我哪见过这场面，当即Google类似情况，却一无所获。<br>没有办法了，当时慌张的我只能选择分别给Netcraft和Cloudflare说明我的意图，请求移除这个标记。<br><em>题外话：当时手足无措的我又买了lingxiw.top这个域名，也就是那时各位见到的被更换的网址。</em>  </p><h2 id="扯皮"><a href="#扯皮" class="headerlink" title="扯皮"></a><del>扯皮</del></h2><p>几个小时后，我得到的来自Netcraft的回复是：  </p><p><img src="/img/2023-1-20_phishing_02.webp" alt="?"><br>不管如何去说明自己没有钓鱼的目的，但不论Netcraft或是Microsoft方面都表示不论目的如何，这样的情况就是钓鱼行为。<br>而Cloudflare方面则根本没有回复我。<br>好吧。<br>移除掉Workers的反代，再根据Cloudflare客服的提示申请复审之后，收到了这样的邮件。  </p><p><img src="/img/2023-1-20_phishing_03.webp" alt="警报解除"><br>后来想来，也许是因为由Workers反向代理的Sharepoint页面不会跳转到Sharepoint的网址，而是直接显示被反代的网址，因此被判定为了钓鱼。  </p><h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>后面发生的事情大家都知道了，我另外买了VPS来为Sutaraito的下载加速。<br>后来，随着<a href="https://616.sb/">616sb</a>的回归，加之阳之后我的精力也不再足以去给Sutaraito更新，所以在那之后经过与马尾简短的交流，我还是决定把Sutaraito关掉，把域名跳转给616sb，相信Konmai下载站能给各位提供良好的下载体验。<br>就到这里吧。写了一大堆不知所云的东西，把这作为运营下载站这样宝贵的经验也不错。<br>今天是1月20日，大寒。提前祝各位农历新年快乐！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>碎碎念</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>碎碎念</tag>
+      
+      <tag>Cloudflare</tag>
+      
+      <tag>关于Sutaraito</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>《魔女的夜宴》稚叶线游玩感想</title>
+    <link href="/20230101/witch_tsumugi/"/>
+    <url>/20230101/witch_tsumugi/</url>
+    
+    <content type="html"><![CDATA[<p>我不是一个很爱推Gal的人，写这样的Galgame的感想也是头一次。但是因为椎叶䌷这样一个角色给我的印象实在是太深刻了。她与我心中理想的白月光的形象太接近了，所以试着用自己贫瘠的语言来记录下我此时的感动。  </p><p>警告：有剧透可能！</p><h2 id="人物介绍"><a href="#人物介绍" class="headerlink" title="人物介绍"></a>人物介绍</h2><p><strong>以下介绍截自萌娘百科</strong>  </p><blockquote><p>在高二第二学期这个奇怪的时间段转入柊史班级的转校生。<br>与其女孩子的外貌相反，穿着男装的少女。<br>但男装并非其爱好，而是类似于宁宁的发情，作为魔女的代价。<br>如果穿上女式的服装就会造成强烈的呕吐影响身体。<br>作为原本非常可爱的女孩子，本人对此代价非常不情愿。<br>女孩子的装束才符合她的兴趣，但唯一能够女装的魔女状态并没有多少人能看到。<br>作为同样抱有秘密的魔女，在被柊史识破之后，加入超自研与宁宁等人一起行动。  </p></blockquote><h2 id="说说剧情"><a href="#说说剧情" class="headerlink" title="说说剧情"></a>说说剧情</h2><p>怎么是画女硬说男…<del>啊就是女生啊那没事了</del>。个人感觉紬最大的特点就是天然，是那种内心毫无杂质的天然，既是呆，又是幼稚，也是纯真。这是一个内心纯真的女孩子，为了成为公主，与口是心非的小恶魔签订契约的童话般的故事。而男主角柊史，也为公主无杂质的内心所倾心，与她相知相恋，感觉自身获得了救赎，与小恶魔签订契约，成为了守护公主的骑士。虽然身为乌鸦的小恶魔还不太能理解人类的感情，三人间也有许多争吵，但在最后面对即将成为艾尔普而暴走的小狗时，三人仍旧能团结起来，并肩作战，迎来美好的未来。在这条线路里，有恋爱的酸甜，有泪水的苦涩，有友情的醇香，再佐以许多笑料与温馨的日常，组成了这样一条童话故事般的路线。这条线没有什么出众之处，在整个游戏中也算是比较平淡的，但它就凭借这样平淡的日常与真挚的感情，令我喜爱。</p><h2 id="说点什么"><a href="#说点什么" class="headerlink" title="说点什么"></a>说点什么</h2><p>魔女的夜宴这部Galgame说起来也是我的入坑作了，早在21年的暑假我就已经完成了宁宁线的推进。<br>但在那之后我发生了不少事情，对最近的我打击最大的是情感上的一些挫折，我陷入了一个消沉的状态。<br>又过了好一段时间，我在无意间刷B站的时候刷到了n1发的这个线路的录播视频。短短的一段视频的线路，就让紬这个角色在我脑海里刻下了深刻的印象。恰好碰上了疫情上网课加之我阳了没法上课，就借此机会把稚叶线推完了。<br>也许是巧合，在剧情推进到柊史生病，稚叶喂粥的剧情时候，当天我也正发着高烧。那一刻心里好像被狠狠捶了一下，不禁落泪。<br>紬在故事里的表现可谓是女友力十足…我也想在现实里遇到这样的人啊…(想什么呢<br>谁不想要一个天真可爱会做饭还对你好的女孩子呢（笑<br>这种天然的性格与女友力十足的角色塑造，也许正是紬这个角色吸引我的地方。  </p><p>  <img src="/img/2023-01-01_tsumugi_01.webp"><br>柊史父亲在忘记柊史期间，所表现出的消沉的感觉也狠狠地刀了我一下。<br>再者值得一提的也有剧情中赤城与紬的外婆长达50年的羁绊，也十分触动人心，这里就不多说了，其实感觉还是亲身去游戏中体会一下比较好。  </p><p>  <img src="/img/2023-01-01_tsumugi_02.webp"><br>现在想来这样的亲情的羁绊，与友情、爱情的细腻的描写，或许正是这条线路中吸引我的地方。  </p><h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>魔宴这部作品对我来说意义颇深，它带给我的感觉也是独一无二的。<br>稍微给紬这条线打个分吧，个人觉得这条线是能够值得90分的。<br>90分里面有相当一部分出于自己的私心，与紬是自己最喜欢的角色之一不无关系。<br>因为她真的太可爱了🤤🤤🤤<br>就写到这里吧。今天是1月1日，再一次祝各位新年快乐！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>碎碎念</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>碎碎念</tag>
+      
+      <tag>柚子社</tag>
+      
+      <tag>Galgame</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World!</title>
+    <link href="/20221230/hello-world/"/>
+    <url>/20221230/hello-world/</url>
+    
+    <content type="html"><![CDATA[<h1 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h1><p>又一次回来了啊…<br>在因为疫情而重新开始的网课加之不幸阳了的我终于是闲了下来，于是想着要好好打理一下博客的时候忽然想要摆烂了，就这样把之前托管在Github Pages的博客给停掉了。<br>但是终究还是<del>闲的蛋疼</del>按捺不住折腾之心的再一次建起了博客，就有了下面的一切。  </p><h1 id="建站过程"><a href="#建站过程" class="headerlink" title="建站过程"></a>建站过程</h1><h2 id="域名选用"><a href="#域名选用" class="headerlink" title="域名选用"></a>域名选用</h2><p>这块也是老生常谈了，我选用的是很早之前在<a href="https://www.namesilo.com/">NameSilo</a>上面购买的域名。NameSilo也是比较出名的服务商了，他们家的域名比其他平台要便宜上好多，最便宜的一些域名加上优惠码首年能干到1刀以内。<br>域名的服务商其实没什么好说的，只要价格适中就可以了。  </p><h2 id="服务器"><a href="#服务器" class="headerlink" title="服务器"></a>服务器</h2><p>不同于之前托管在Github Pages，我选用了Amazon AWS的EC2服务器，当然是因为<del>是白嫖的</del> 体验比较好，速度也经过作为为<a href="https://sutaraito.top/">Sutaraito</a>作为反代服务器时的验证，所以选用了它。  </p><p>参考:<a href="https://aws.amazon.com/cn/">AWS云服务</a>  </p><h3 id="系统？"><a href="#系统？" class="headerlink" title="系统？"></a>系统？</h3><p>我习惯使用的Linux发行版自然是CentOS。但是因为众所周知的原因，我选用了Alma Linux作为服务器的系统。  </p><h2 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h2><p>毫无疑问使用了Cloudflare作为CDN，而说到Cloudflare，我还在运营Sutaraito的过程中与Cloudflare发生了一些有趣(并不)的事情，这些以后再说。<br>Cloudflare的优点自不必多说，主要是两大点:功能全面、配置方便。它也十分良心的提供了无限 CDN 流量、自带抗 DDoS 防护、自带 SSL 证书等等服务，且无需备案。  </p><p>参考:<a href="https://developers.cloudflare.com/fundamentals/get-started/setup">Set up Cloudflare - Cloudflare Fundamentals docs</a>  </p><h2 id="博客系统"><a href="#博客系统" class="headerlink" title="博客系统"></a>博客系统</h2><p>说来可就痛苦了去了，在重新配置博客的这几天，我尝试了Typecho、WordPress、Hexo这样三种系统，但前两种都不太合我心意。<br>Typecho配置和管理其实与建立一般的LNMP&#x2F;LAMP网站差不多，但是它所现有的一些主题总在某些方面上面总感觉…不太舒服？加之我目前的技术力也不太行，难以对一些主题作出较为符合我自己喜好的自定义，就换掉了。尝试WordPress的经历跟Typecho差不多，就不多说了。<br>思前想后，果然还是用回自己熟悉的Hexo比较好。它的管理、构建都比较符合我的习惯，所以就这么做了。<br>主题也换成了<a href="https://hexo.fluid-dev.com/docs/">Fluid</a>,这是一款自定义程度比较高，也很美观大气的主题，推荐大家尝试。  </p><h1 id="配置过程"><a href="#配置过程" class="headerlink" title="配置过程"></a>配置过程</h1><p>Hexo的配置过程已经到处都是了，也不太必要再重复造轮子，有兴趣的各位也可以看看：<a href="https://hexo.io/zh-cn/docs/index.html">Hexo官方文档</a> ，这里会有比较详细的配置教程。<br>主要不同的是，我多用了Nginx来为网站套了一层反向代理，然后为博客添加了SSL证书。  </p><p>参考:<a href="https://github.com/acmesh-official/acme.sh/wiki/%E8%AF%B4%E6%98%8E">说明 · acmesh-official&#x2F;acme.sh</a>    </p><h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>嗯…要说的大概就这么多了？总之我觉得建站不是一个很困难的过程，主要是找到自己适合的博客系统与主题需要时间，这才是真正困难的事情。<br>希望我的文字能够帮到你！<br>还有…提前祝屏幕前的你新年快乐！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>碎碎念</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>碎碎念</tag>
+      
+      <tag>Blog</tag>
+      
+      <tag>建站</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
